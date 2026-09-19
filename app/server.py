@@ -34,9 +34,8 @@ def create_app():
         username = request.form.get("username", "")
         password = request.form.get("password", "")
         conn = db.connect()
-        sql = ("SELECT id, username, role FROM users "
-               "WHERE username = '%s' AND password = '%s'" % (username, password))
-        row = conn.execute(sql).fetchone()
+        sql = "SELECT id, username, role FROM users WHERE username = ? AND password = ?"
+        row = conn.execute(sql, (username, password)).fetchone()
         conn.close()
         if row:
             session["user"] = {"id": row["id"], "username": row["username"], "role": row["role"]}
