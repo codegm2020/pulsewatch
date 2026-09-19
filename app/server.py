@@ -59,6 +59,9 @@ def create_app():
         sort = request.args.get("sort", "id")
         if status is not None:
             return jsonify(results=queries.monitors_by_status(status))
+        allowed_sort_columns = {"id", "name", "host", "status"}
+        if sort not in allowed_sort_columns:
+            sort = "id"
         conn = db.connect()
         sql = "SELECT id, name, host, status FROM monitors ORDER BY " + sort
         rows = [dict(r) for r in conn.execute(sql).fetchall()]
