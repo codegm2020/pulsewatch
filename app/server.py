@@ -24,8 +24,8 @@ def create_app():
     def search():
         q = request.args.get("q", "")
         conn = db.connect()
-        sql = "SELECT id, name, host, status FROM monitors WHERE name LIKE '%" + q + "%'"
-        rows = [dict(r) for r in conn.execute(sql).fetchall()]
+        sql = "SELECT id, name, host, status FROM monitors WHERE name LIKE ?"
+        rows = [dict(r) for r in conn.execute(sql, ('%' + q + '%',)).fetchall()]
         conn.close()
         return jsonify(results=rows)
 
