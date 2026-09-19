@@ -107,8 +107,8 @@ def create_app():
     def api_status():
         token = request.args.get("token", "")
         conn = db.connect()
-        sql = "SELECT username, role FROM users WHERE api_token = '" + token + "'"
-        row = conn.execute(sql).fetchone()
+        sql = "SELECT username, role FROM users WHERE api_token = ?"
+        row = conn.execute(sql, (token,)).fetchone()
         conn.close()
         if row:
             return jsonify(ok=True, user=dict(row))
