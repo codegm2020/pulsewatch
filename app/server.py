@@ -96,7 +96,8 @@ def create_app():
     def delete_monitor():
         mid = request.form.get("id", "0")
         conn = db.connect()
-        conn.executescript("DELETE FROM monitors WHERE id = " + mid)
+        sql = "DELETE FROM monitors WHERE id = ?"
+        conn.execute(sql, (mid,))
         conn.commit()
         conn.close()
         return jsonify(ok=True)
