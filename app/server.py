@@ -47,8 +47,8 @@ def create_app():
     def history():
         monitor_id = request.args.get("monitor_id", "0")
         conn = db.connect()
-        sql = "SELECT id, monitor_id, ts, status, latency_ms FROM checks WHERE monitor_id = " + monitor_id
-        rows = [dict(r) for r in conn.execute(sql).fetchall()]
+        sql = "SELECT id, monitor_id, ts, status, latency_ms FROM checks WHERE monitor_id = ?"
+        rows = [dict(r) for r in conn.execute(sql, (monitor_id,)).fetchall()]
         conn.close()
         return jsonify(results=rows)
 
