@@ -5,8 +5,8 @@ from .db import connect
 def monitors_by_status(status):
     """List monitors filtered by status."""
     conn = connect()
-    q = "SELECT id, name, host, status FROM monitors WHERE status = '%s'" % status
-    rows = conn.execute(q).fetchall()
+    q = "SELECT id, name, host, status FROM monitors WHERE status = ?"
+    rows = conn.execute(q, (status,)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
