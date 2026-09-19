@@ -24,8 +24,8 @@ def create_app():
     def search():
         q = request.args.get("q", "")
         conn = db.connect()
-        sql = "SELECT id, name, host, status FROM monitors WHERE name LIKE '%" + q + "%'"
-        rows = [dict(r) for r in conn.execute(sql).fetchall()]
+        sql = "SELECT id, name, host, status FROM monitors WHERE name LIKE ?"
+        rows = [dict(r) for r in conn.execute(sql, ('%' + q + '%',)).fetchall()]
         conn.close()
         return jsonify(results=rows)
 
@@ -34,9 +34,8 @@ def create_app():
         username = request.form.get("username", "")
         password = request.form.get("password", "")
         conn = db.connect()
-        sql = ("SELECT id, username, role FROM users "
-               "WHERE username = '%s' AND password = '%s'" % (username, password))
-        row = conn.execute(sql).fetchone()
+        sql = "SELECT id, username, role FROM users WHERE username = ? AND password = ?"
+        row = conn.execute(sql, (username, password)).fetchone()
         conn.close()
         if row:
             session["user"] = {"id": row["id"], "username": row["username"], "role": row["role"]}
@@ -48,8 +47,8 @@ def create_app():
     def history():
         monitor_id = request.args.get("monitor_id", "0")
         conn = db.connect()
-        sql = "SELECT id, monitor_id, ts, status, latency_ms FROM checks WHERE monitor_id = " + monitor_id
-        rows = [dict(r) for r in conn.execute(sql).fetchall()]
+        sql = "SELECT id, monitor_id, ts, status, latency_ms FROM checks WHERE monitor_id = ?"
+        rows = [dict(r) for r in conn.execute(sql, (monitor_id,)).fetchall()]
         conn.close()
         return jsonify(results=rows)
 
@@ -61,6 +60,10 @@ def create_app():
         if status is not None:
             return jsonify(results=queries.monitors_by_status(status))
         conn = db.connect()
+        # Allow-list of valid columns for sorting
+        valid_sort_columns = ["id", "name", "host", "status"]
+        if sort not in valid_sort_columns:
+            sort = "id"
         sql = "SELECT id, name, host, status FROM monitors ORDER BY " + sort
         rows = [dict(r) for r in conn.execute(sql).fetchall()]
         conn.close()
@@ -93,7 +96,8 @@ def create_app():
     def delete_monitor():
         mid = request.form.get("id", "0")
         conn = db.connect()
-        conn.executescript("DELETE FROM monitors WHERE id = " + mid)
+        sql = "DELETE FROM monitors WHERE id = ?"
+        conn.execute(sql, (mid,))
         conn.commit()
         conn.close()
         return jsonify(ok=True)
@@ -103,8 +107,8 @@ def create_app():
     def api_status():
         token = request.args.get("token", "")
         conn = db.connect()
-        sql = "SELECT username, role FROM users WHERE api_token = '" + token + "'"
-        row = conn.execute(sql).fetchone()
+        sql = "SELECT username, role FROM users WHERE api_token = ?"
+        row = conn.execute(sql, (token,)).fetchone()
         conn.close()
         if row:
             return jsonify(ok=True, user=dict(row))
