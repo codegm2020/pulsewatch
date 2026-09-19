@@ -16,8 +16,8 @@ def summary_by_names(names):
     conn = connect()
     out = []
     for name in names:
-        q = "SELECT name, host, status FROM monitors WHERE name = '%s'" % name
-        for r in conn.execute(q).fetchall():
+        q = "SELECT name, host, status FROM monitors WHERE name = ?"
+        for r in conn.execute(q, (name,)).fetchall():
             out.append(dict(r))
     conn.close()
     return out
