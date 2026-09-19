@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"><title>PulseWatch</title>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#0b0b12;color:#eee;margin:0;padding:2rem}
+    h1{font-weight:800;letter-spacing:-.02em}
+    table{border-collapse:collapse;width:100%;margin-top:1rem}
+    th,td{border-bottom:1px solid #333;padding:.5rem .75rem;text-align:left}
+    .up{color:#5eead4}.down{color:#fb7185}.degraded{color:#fbbf24}.unknown{color:#94a3b8}
+    input{background:#15151f;border:1px solid #333;color:#eee;padding:.4rem .6rem}
+  </style>
+</head>
+<body>
+  <h1>PulseWatch</h1>
+  <p>Monitored endpoints {% if user %}· signed in as {{ user.username }}{% endif %}</p>
+  <form action="/search"><input name="q" placeholder="search monitors…"></form>
+  <table>
+    <tr><th>ID</th><th>Name</th><th>Host</th><th>Status</th></tr>
+    {% for m in monitors %}
+    <tr><td>{{ m.id }}</td><td>{{ m.name }}</td><td>{{ m.host }}</td>
+        <td class="{{ m.status }}">{{ m.status }}</td></tr>
+    {% endfor %}
+  </table>
+</body>
+</html>
